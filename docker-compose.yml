@@ -33,6 +33,8 @@ services:
     ports:
       - 9200:9200
       - 9600:9600
+    networks:
+      - default
 
   kibana:
     restart: always
@@ -50,11 +52,15 @@ services:
       - "./opensearch-dashboards.yml:/usr/share/opensearch-dashboards/config/opensearch_dashboards.yml"
     ports:
       - 5601:5601
+    networks:
+      - default
   logstash:
     image: opensearchproject/logstash-oss-with-opensearch-output-plugin:7.16.2
     container_name: logstash
     volumes:
       - ./logstash.conf:/usr/share/logstash/pipeline.logstash.conf
+    networks:
+      - default
 
 volumes:
   os-data1:
