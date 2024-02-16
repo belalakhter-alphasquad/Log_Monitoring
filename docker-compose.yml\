@@ -35,7 +35,7 @@ services:
       - opensearch-net
 
   filebeat:
-    image: docker.elastic.co/beats/filebeat:7.10.0 
+    image: docker.elastic.co/beats/filebeat 
     container_name: filebeat
     user: root 
     volumes:
