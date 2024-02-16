@@ -58,7 +58,7 @@ services:
     image: opensearchproject/logstash-oss-with-opensearch-output-plugin:7.16.2
     container_name: logstash
     volumes:
-      - ./logstash.conf:/usr/share/logstash/pipeline.logstash.conf
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
     networks:
       - default
 
