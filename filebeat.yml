@@ -1,0 +1,10 @@
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /usr/share/filebeat/logs/*.log  
+
+output.opensearch:
+  hosts: ["http://opensearch-node1:9200"]
+  username: "admin" 
+  password: "admin" 

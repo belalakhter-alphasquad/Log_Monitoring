@@ -1,0 +1,53 @@
+version: '3'
+services:
+  opensearch-node1:
+    image: opensearchproject/opensearch:1.3.0
+    container_name: opensearch-node1
+    environment:
+      - cluster.name=opensearch-cluster
+      - node.name=opensearch-node1
+      - discovery.seed_hosts=opensearch-node1
+      - cluster.initial_master_nodes=opensearch-node1
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - opensearch-data1:/usr/share/opensearch/data
+    ports:
+      - 9200:9200
+      - 9600:9600
+    networks:
+      - opensearch-net
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:1.3.0
+    container_name: opensearch-dashboards
+    ports:
+      - 5601:5601
+    expose:
+      - "5601"
+    environment:
+      OPENSEARCH_HOSTS: '["http://opensearch-node1:9200"]'
+    networks:
+      - opensearch-net
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.10.0 
+    container_name: filebeat
+    user: root 
+    volumes:
+      - /home/alphaqsquad/work/day9/monkeytilt/java/crypto_games/gateway/logs:/usr/share/filebeat/logs:ro
+      - /home/alphaqsquad/Log_Monitoring/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+    depends_on:
+      - opensearch-node1
+    networks:
+      - opensearch-net
+
+volumes:
+  opensearch-data1:
+
+networks:
+  opensearch-net:
