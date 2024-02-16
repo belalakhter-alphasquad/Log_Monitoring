@@ -13,6 +13,7 @@ plugins.security.ssl.http.pemtrustedcas_filepath: certificates/ca/ca.pem
 plugins.security.ssl.transport.enabled: true
 plugins.security.ssl.transport.pemtrustedcas_filepath: certificates/ca/ca.pem
 plugins.security.ssl.transport.enforce_hostname_verification: false
+compatibility.override_main_response_version: true
 
 plugins.security.authcz.admin_dn:
   - "CN=ADMIN,O=EXAMPLE,L=PARIS,ST=IDF,C=FR"
