@@ -1,19 +1,22 @@
-version: '3'
+version: "3"
 services:
   opensearch-node1:
-    image: opensearchproject/opensearch
+    image: opensearchproject/opensearch:latest
     container_name: opensearch-node1
     environment:
       - cluster.name=opensearch-cluster
       - node.name=opensearch-node1
-      - discovery.seed_hosts=opensearch-node1
-      - cluster.initial_master_nodes=opensearch-node1
+      - discovery.seed_hosts=opensearch-node1,opensearch-node2
+      - cluster.initial_cluster_manager_nodes=opensearch-node1,opensearch-node2
       - bootstrap.memory_lock=true
       - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
       memlock:
         soft: -1
         hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
     volumes:
       - opensearch-data1:/usr/share/opensearch/data
     ports:
@@ -22,32 +25,55 @@ services:
     networks:
       - opensearch-net
 
+  opensearch-node2:
+    image: opensearchproject/opensearch:latest
+    container_name: opensearch-node2
+    environment:
+      - cluster.name=opensearch-cluster
+      - node.name=opensearch-node2
+      - discovery.seed_hosts=opensearch-node1,opensearch-node2
+      - cluster.initial_cluster_manager_nodes=opensearch-node1,opensearch-node2
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - opensearch-data2:/usr/share/opensearch/data
+    networks:
+      - opensearch-net
+
   opensearch-dashboards:
-    image: opensearchproject/opensearch-dashboards
+    image: opensearchproject/opensearch-dashboards:latest
     container_name: opensearch-dashboards
     ports:
       - 5601:5601
     expose:
       - "5601"
     environment:
-      OPENSEARCH_HOSTS: '["http://opensearch-node1:9200"]'
+      OPENSEARCH_HOSTS: '["https://opensearch-node1:9200","https://opensearch-node2:9200"]'
     networks:
       - opensearch-net
 
   filebeat:
-    image: docker.elastic.co/beats/filebeat:7.10.0 
+    image: docker.elastic.co/beats/filebeat:7.17.18
     container_name: filebeat
-    user: root 
+    user: root
     volumes:
-      - /home/alphaqsquad/work/day9/monkeytilt/java/crypto_games/gateway/logs:/usr/share/filebeat/logs:ro
-      - /home/alphaqsquad/Log_Monitoring/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - /home/alphaqsquad/work/day9/monkeytilt/java/crypto_games/gateway/logs:/var/log/host:ro
     depends_on:
-      - opensearch-node1
+      - opensearch
     networks:
       - opensearch-net
 
 volumes:
   opensearch-data1:
+  opensearch-data2:
 
 networks:
   opensearch-net:
