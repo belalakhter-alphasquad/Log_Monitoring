@@ -1,7 +1,7 @@
 log-pipeline:
   source:
     http:
-      ssl: false
+      ssl: true
   processor:
     - grok:
         match:

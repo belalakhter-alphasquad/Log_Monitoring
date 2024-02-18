@@ -1,0 +1,28 @@
+cluster.name: os-cluster
+network.host: 0.0.0.0
+
+bootstrap.memory_lock: "true"
+
+cluster.routing.allocation.disk.threshold_enabled: true
+cluster.routing.allocation.disk.watermark.low: 93%
+cluster.routing.allocation.disk.watermark.high: 95%
+
+plugins.security.allow_unsafe_democertificates: true
+plugins.security.ssl.http.enabled: true
+plugins.security.ssl.http.pemtrustedcas_filepath: certificates/ca/ca.pem
+plugins.security.ssl.transport.enabled: true
+plugins.security.ssl.transport.pemtrustedcas_filepath: certificates/ca/ca.pem
+plugins.security.ssl.transport.enforce_hostname_verification: false
+compatibility.override_main_response_version: true
+
+plugins.security.authcz.admin_dn:
+  - "CN=ADMIN,O=Alpha,L=ISB,ST=IDF,C=PK"
+plugins.security.nodes_dn:
+  - "CN=os00,O=Alpha,L=ISB,ST=IDF,C=PK"
+  - "CN=os01,O=Alpha,L=ISB,ST=IDF,C=PK"
+  - "CN=os02,O=Alpha,L=ISB,ST=IDF,C=PK"
+  - "CN=os03,O=Alpha,L=ISB,ST=IDF,C=PK"
+  - "CN=os04,O=Alpha,L=ISB,ST=IDF,C=PK"
+  - "CN=os05,O=Alpha,L=ISB,ST=IDF,C=PK"
+  - "CN=os06,O=Alpha,L=ISB,ST=IDF,C=PK"
+  - "CN=os07,O=Alpha,L=ISB,ST=IDF,C=PK"

@@ -1,65 +1,58 @@
-version: "3"
+version: "3.7"
+
 services:
-  opensearch-node1:
+  os01:
+    restart: always
     image: opensearchproject/opensearch:latest
-    container_name: opensearch-node1
     environment:
-      - cluster.name=opensearch-cluster
-      - node.name=opensearch-node1
-      - discovery.seed_hosts=opensearch-node1,opensearch-node2
-      - cluster.initial_cluster_manager_nodes=opensearch-node1,opensearch-node2
-      - bootstrap.memory_lock=true
-      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      OPENSEARCH_JAVA_OPTS: "-Xms1024m -Xmx1024m"
+      node.name: os01
+      discovery.seed_hosts: os01
+      cluster.initial_master_nodes: os01
+      plugins.security.ssl.transport.pemkey_filepath: certificates/os01/os01.key
+      plugins.security.ssl.transport.pemcert_filepath: certificates/os01/os01.pem
+      plugins.security.ssl.http.pemkey_filepath: certificates/os01/os01.key
+      plugins.security.ssl.http.pemcert_filepath: certificates/os01/os01.pem
+      DISABLE_INSTALL_DEMO_CONFIG: "true"
+      JAVA_HOME: /usr/share/opensearch/jdk
+      bootstrap.memory_lock: "true"
+      network.host: "0.0.0.0"
     ulimits:
       memlock:
         soft: -1
         hard: -1
-      nofile:
-        soft: 65536
-        hard: 65536
     volumes:
-      - opensearch-data1:/usr/share/opensearch/data
+      - "./opensearch.yml:/usr/share/opensearch/config/opensearch.yml"
+      - "os-data1:/usr/share/opensearch/data"
+      - "./certs:/usr/share/opensearch/config/certificates:ro"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "1"
     ports:
       - 9200:9200
-      - 9600:9600
     networks:
-      - opensearch-net
-  opensearch-node2:
-    image: opensearchproject/opensearch:2.3.0
-    container_name: opensearch-node2
+      - default
+
+  kibana:
+    restart: always
+    image: opensearchproject/opensearch-dashboards:latest
     environment:
-      - cluster.name=opensearch-cluster
-      - node.name=opensearch-node2
-      - discovery.seed_hosts=opensearch-node1,opensearch-node2
-      - cluster.initial_cluster_manager_nodes=opensearch-node1,opensearch-node2
-      - bootstrap.memory_lock=true
-      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-      nofile:
-        soft: 65536
-        hard: 65536
+      OPENSEARCH_HOSTS: '["https://os01:9200"]'
+      DISABLE_INSTALL_DEMO_CONFIG: "true"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "1"
     volumes:
-      - opensearch-data2:/usr/share/opensearch/data
-    networks:
-      - opensearch-net
-  opensearch-dashboards:
-    image: opensearchproject/opensearch-dashboards:2.3.0
-    container_name: opensearch-dashboards
+      - "./certs:/usr/share/opensearch-dashboards/config/certificates:ro"
+      - "./opensearch-dashboards.yml:/usr/share/opensearch-dashboards/config/opensearch_dashboards.yml"
     ports:
       - 5601:5601
-    expose:
-      - "5601"
-    environment:
-      OPENSEARCH_HOSTS: '["https://opensearch-node1:9200","https://opensearch-node2:9200"]'
     networks:
-      - opensearch-net
+      - default
 
 volumes:
-  opensearch-data1:
-  opensearch-data2:
-
-networks:
-  opensearch-net:
+  os-data1:
