@@ -9,7 +9,7 @@ log-pipeline:
   sink:
     - opensearch:
         hosts: ["https://localhost:9200"]
-        insecure: true
+        insecure: false
         username: admin
         password: admin
         index: test_logs
