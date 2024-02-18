@@ -1,0 +1,12 @@
+version: "3"
+services:
+  fluent-bit:
+    container_name: fluent-bit
+    image: fluent/fluent-bit
+    volumes:
+      - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+      - ./test.log:/var/log/access.log
+    networks:
+      - opensearch-net
+networks:
+  opensearch-net:

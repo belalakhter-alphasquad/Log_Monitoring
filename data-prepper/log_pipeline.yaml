@@ -5,10 +5,10 @@ log-pipeline:
   processor:
     - grok:
         match:
-          log: [ "%{COMMONAPACHELOG}" ]
+          log: ["%{COMMONAPACHELOG}"]
   sink:
     - opensearch:
-        hosts: [ "https://localhost:9200" ]
+        hosts: ["https://localhost:9200"]
         insecure: true
         username: admin
         password: admin
