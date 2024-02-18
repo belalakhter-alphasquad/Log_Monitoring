@@ -48,7 +48,7 @@ services:
     container_name: data-prepper
     image: opensearchproject/data-prepper:latest
     volumes:
-      - ${PWD}/pipeline.yaml:/usr/share/data-prepper/pipelines/pipeline.yaml
+      - ./pipeline.yaml:/usr/share/data-prepper/pipelines/pipeline.yaml
     ports:
       - "4900:4900"
     networks:

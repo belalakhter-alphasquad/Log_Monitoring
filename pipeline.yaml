@@ -12,4 +12,4 @@ log-pipeline:
         insecure: true
         username: admin
         password: admin
-        index: Testing_Logs
+        index: testing_logs
