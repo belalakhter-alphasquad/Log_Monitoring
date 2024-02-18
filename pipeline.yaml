@@ -1,15 +1,15 @@
 log-pipeline:
   source:
     http:
-      ssl: true
+      ssl: false
   processor:
     - grok:
         match:
           log: ["%{COMMONAPACHELOG}"]
   sink:
     - opensearch:
-        hosts: ["https://localhost:9200"]
-        insecure: false
+        hosts: ["https://opensearch:9200"]
+        insecure: true
         username: admin
         password: admin
-        index: test_logs
+        index: Testing_Logs
