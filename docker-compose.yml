@@ -7,6 +7,8 @@ services:
       - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
       - /home/alphaqsquad/work/day10/monkeytilt/java/crypto_games/gateway/logs/myApp.log:/var/log/test1.log
       - ./test2.log:/var/log/test2.log
+      - ./parser.conf:/fluent-bit/etc/parser.conf
+      - ./filter.lua:/fluent-bit/etc/filter.lua
     networks:
       - opensearch-net
 

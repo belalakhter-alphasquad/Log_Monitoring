@@ -12,4 +12,4 @@ log-pipeline:
         insecure: true
         username: admin
         password: admin
-        index: aeron_logs
+        index: test_logs_1
