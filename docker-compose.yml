@@ -5,10 +5,17 @@ services:
     image: fluent/fluent-bit
     volumes:
       - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
-      - /home/alphaqsquad/work/day10/monkeytilt/java/crypto_games/gateway/logs/myApp.log:/var/log/test1.log
+      - /home/alpha/monkeytilt/java/crypto_games/gateway/logs/myApp.log:/var/log/test1.log
       - ./test2.log:/var/log/test2.log
-      - ./parser.conf:/fluent-bit/etc/parser.conf
       - ./filter.lua:/fluent-bit/etc/filter.lua
+      - /home/alpha/fluent-bit/storage:/var/log/flb-storage
+
+    environment:
+      FLB_STORAGE_PATH: "/var/log/flb-storage"
+      FLB_TAIL_BUFFER_CHUNK_SIZE: "512KB"
+      FLB_TAIL_BUFFER_MAX_SIZE: "5MB"
+      FLB_STORAGE_MAX_CHUNKS_UP: "10"
+      FLB_STORAGE_BACKLOG_MEM_LIMIT: "50MB"
     networks:
       - opensearch-net
 
