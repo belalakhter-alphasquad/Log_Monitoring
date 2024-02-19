@@ -1,59 +1,75 @@
 -- local last_timestamp
--- local last_log
+-- local buffer = {}
 
 -- function process_line(tag, timestamp, record)
 --     local log = record["log"]
---     local new_record = record
 --     local year, month, day, hour, min, sec, msec, rest = log:match("(%d+)-(%d+)-(%d+) (%d+):(%d+):(%d+),(%d+) (.*)")
 
+--     -- If the current line starts with a timestamp, it's the start of a new log entry
 --     if year then
---         -- A new log entry with a timestamp is found
---         -- Convert the timestamp to Fluent Bit's format (nanoseconds resolution)
---         local fluent_bit_timestamp = string.format("%s-%s-%s %s:%s:%s.%s000000", year, month, day, hour, min, sec, msec)
---         -- Update last_timestamp and last_log with the new log entry
---         last_timestamp = fluent_bit_timestamp
---         last_log = log
---         -- Update the log with the new timestamp
---         new_record["log"] = fluent_bit_timestamp .. " " .. rest
---     elseif last_log then
---         -- If the line doesn't start with a timestamp, append it to the last log
---         last_log = last_log .. " " .. log
---         -- Use the last known timestamp
---         new_record["log"] = last_timestamp .. " " .. last_log
+--         -- If there's something in the buffer, we need to flush it as a single log entry
+--         if #buffer > 0 then
+--             -- Concatenate all the buffered lines
+--             local flushed_log = table.concat(buffer, " ")
+--             -- Clear the buffer
+--             buffer = {}
+--             -- Return the concatenated log entry
+--             return 1, timestamp, {["log"] = flushed_log}
+--         end
+--         -- Store the current timestamped line in the buffer
+--         table.insert(buffer, log)
+--         -- Update last timestamp
+--         last_timestamp = string.format("%s-%s-%s %s:%s:%s.%s000000", year, month, day, hour, min, sec, msec)
 --     else
---         -- If there's no last_log, this line is an orphan and we'll discard it
---         return -1, timestamp, record
+--         -- If the line does not start with a timestamp, it's a continuation of the previous log entry
+--         if last_timestamp then
+--             -- Append the line to the buffer
+--             table.insert(buffer, log)
+--         end
 --     end
 
---     -- Return the timestamp (unchanged) and the modified log record
---     return 1, timestamp, new_record
+--     -- If this is the end of the log or there's nothing to process, do nothing
+--     return -1, timestamp, record
 -- end
 
-local buffer = {}
+-- -- Flush any remaining log entries when the script ends
+-- function on_exit(tag, timestamp, record)
+--     if #buffer > 0 then
+--         local flushed_log = table.concat(buffer, " ")
+--         buffer = {}
+--         return 1, timestamp, {["log"] = flushed_log}
+--     end
+-- end
+
 local last_timestamp
+local current_log = {}
 
 function process_line(tag, timestamp, record)
-    local log = record["log"]
-    local year, month, day, hour, min, sec, msec, rest = log:match("(%d+)-(%d+)-(%d+) (%d+):(%d+):(%d+),(%d+) (.*)")
+    local line = record["log"]
+    local year, month, day, hour, min, sec, msec, rest = line:match("(%d+)-(%d+)-(%d+) (%d+):(%d+):(%d+),(%d+) (.*)")
 
-    if year then
-        -- A new log entry with a timestamp is found
-        -- Convert the timestamp to Fluent Bit's format (nanoseconds resolution)
-        local fluent_bit_timestamp = string.format("%s-%s-%s %s:%s:%s.%s000000", year, month, day, hour, min, sec, msec)
+    -- Check if this is a line starting with a timestamp
+    if year and month and day and hour and min and sec and msec then
+        -- A new log entry starts
+        -- Convert the timestamp to Fluent Bit's format
+        local fluent_bit_timestamp = string.format("%s-%s-%sT%s:%s:%s.%s000000Z", year, month, day, hour, min, sec, msec)
         last_timestamp = fluent_bit_timestamp
 
-        -- If buffer is not empty, concatenate the buffered lines as a single log entry
-        if #buffer > 0 then
-            local concatenated_log = table.concat(buffer, " ")
-            buffer = {}  -- Clear the buffer for the next log entry
-            return 1, fluent_bit_timestamp, {log=concatenated_log}
+        -- If there is a log message being constructed, send it out before starting a new one
+        if next(current_log) then
+            local full_message = table.concat(current_log, " ")
+            current_log = {} -- reset for the next message
+            table.insert(current_log, line) -- start the new message
+            -- Send out the full message that was constructed
+            return 1, fluent_bit_timestamp, {["log"] = full_message}
         else
-            return 1, fluent_bit_timestamp, {log=fluent_bit_timestamp .. " " .. rest}
+            -- This is the first line of a new message
+            table.insert(current_log, line)
+            return -1, timestamp, record
         end
     else
-        -- If the line doesn't start with a timestamp, append it to the buffer
-        table.insert(buffer, log)
-        -- Do not send the record yet
+        -- This line is a continuation of the current log message
+        table.insert(current_log, line)
         return -1, timestamp, record
     end
 end
