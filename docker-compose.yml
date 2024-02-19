@@ -5,7 +5,8 @@ services:
     image: fluent/fluent-bit
     volumes:
       - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
-      - ./test1.log:/var/log/test1.log
+      - ./parsers.conf:/fluent-bit/etc/parsers.conf
+      - /home/alpha/monkeytilt/java/crypto_games/gateway/logs/myApp.log:/var/log/test1.log
       - ./test2.log:/var/log/test2.log
     networks:
       - opensearch-net
