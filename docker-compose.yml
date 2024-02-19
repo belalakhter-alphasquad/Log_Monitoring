@@ -4,10 +4,8 @@ services:
     container_name: fluent-bit
     image: fluent/fluent-bit
     volumes:
-      - /home/alpha/Log_Monitoring/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
-      - /home/alpha/Log_Monitoring/parsers.conf:/fluent-bit/etc/parsers.conf
-      - /home/alpha/Log_Monitoring/process_logs.lua:/fluent-bit/etc/process_logs.lua
-      - /home/alpha/monkeytilt/java/crypto_games/gateway/logs/myApp.log:/var/log/test1.log
+      - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+      - /home/alphaqsquad/work/day10/monkeytilt/java/crypto_games/gateway/logs/myApp.log:/var/log/test1.log
       - ./test2.log:/var/log/test2.log
     networks:
       - opensearch-net
