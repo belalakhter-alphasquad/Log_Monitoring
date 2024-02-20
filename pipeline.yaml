@@ -1,7 +1,8 @@
-log-pipeline:
+gateway_pipeline:
   source:
     http:
       ssl: false
+      port: 2021
   processor:
     - grok:
         match:
@@ -12,12 +13,12 @@ log-pipeline:
         insecure: true
         username: admin
         password: admin
-        index: test_logs_1
-        
-log-pipeline:
+        index: gateway_logs
+hedger_pipeline:
   source:
     http:
       ssl: false
+      port: 2022
   processor:
     - grok:
         match:
@@ -28,5 +29,20 @@ log-pipeline:
         insecure: true
         username: admin
         password: admin
-        index: test_logs_1
-        
+        index: hedger_logs
+cluster_pipeline:
+  source:
+    http:
+      ssl: false
+      port: 2023
+  processor:
+    - grok:
+        match:
+          log: ["%{COMMONAPACHELOG}"]
+  sink:
+    - opensearch:
+        hosts: ["https://opensearch:9200"]
+        insecure: true
+        username: admin
+        password: admin
+        index: cluster_logs

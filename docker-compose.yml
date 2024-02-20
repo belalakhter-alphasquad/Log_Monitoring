@@ -5,12 +5,12 @@ services:
     image: fluent/fluent-bit
     volumes:
       - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
-      - /home/alpha/monkeytilt/java/crypto_games/gateway/logs/myApp.log:/var/log/test1.log
+      - /home/alpha/monkeytilt/java/crypto_games/gateway/logs/myApp.log:/var/log/gateway.log
+      - /home/alpha/monkeytilt/java/crypto_games/clusterservice/logs/myApp.log:/var/log/cluster.log
+      - /home/alpha/monkeytilt/java/crypto_games/hedger-client/logs/myApp.log:/var/log/hedger.log
       - ./test2.log:/var/log/test2.log
       - ./filter.lua:/fluent-bit/etc/filter.lua
       - /home/alpha/fluent-bit/storage:/var/log/flb-storage
-    depends_on:
-      - data-prepper 
 
     environment:
       FLB_STORAGE_PATH: "/var/log/flb-storage"
