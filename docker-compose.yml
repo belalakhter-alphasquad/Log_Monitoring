@@ -1,8 +1,20 @@
 version: "3"
 services:
+  data-prepper:
+    container_name: data-prepper
+    image: opensearchproject/data-prepper:latest
+    volumes:
+      - ./pipeline.yaml:/usr/share/data-prepper/pipelines/pipeline.yaml
+    ports:
+      - "4900:4900"
+    networks:
+      - opensearch-net
+
   fluent-bit:
     container_name: fluent-bit
     image: fluent/fluent-bit
+    depends_on:
+      - data-prepper
     volumes:
       - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
       - /home/alpha/monkeytilt/java/crypto_games/gateway/logs/myApp.log:/var/log/gateway.log
@@ -52,16 +64,6 @@ services:
       OPENSEARCH_HOSTS: '["https://opensearch:9200"]'
     depends_on:
       - opensearch
-    networks:
-      - opensearch-net
-
-  data-prepper:
-    container_name: data-prepper
-    image: opensearchproject/data-prepper:latest
-    volumes:
-      - ./pipeline.yaml:/usr/share/data-prepper/pipelines/pipeline.yaml
-    ports:
-      - "4900:4900"
     networks:
       - opensearch-net
 
