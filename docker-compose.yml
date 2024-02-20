@@ -9,6 +9,8 @@ services:
       - ./test2.log:/var/log/test2.log
       - ./filter.lua:/fluent-bit/etc/filter.lua
       - /home/alpha/fluent-bit/storage:/var/log/flb-storage
+    depends_on:
+      - data-prepper 
 
     environment:
       FLB_STORAGE_PATH: "/var/log/flb-storage"
