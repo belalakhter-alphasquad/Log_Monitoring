@@ -1,7 +1,8 @@
-log-pipeline:
+test1-pipeline:
   source:
     http:
       ssl: false
+      port: 2021
   processor:
     - grok:
         match:
@@ -12,4 +13,38 @@ log-pipeline:
         insecure: true
         username: admin
         password: admin
-        index: test_logs_1
+        index: test_logs_check_1
+
+test2-pipeline:
+  source:
+    http:
+      ssl: false
+      port: 2022
+  processor:
+    - grok:
+        match:
+          log: ["%{COMMONAPACHELOG}"]
+  sink:
+    - opensearch:
+        hosts: ["https://opensearch:9200"]
+        insecure: true
+        username: admin
+        password: admin
+        index: test_logs_check_2
+
+test3-pipeline:
+  source:
+    http:
+      ssl: false
+      port: 2023
+  processor:
+    - grok:
+        match:
+          log: ["%{COMMONAPACHELOG}"]
+  sink:
+    - opensearch:
+        hosts: ["https://opensearch:9200"]
+        insecure: true
+        username: admin
+        password: admin
+        index: test_logs_check_3
