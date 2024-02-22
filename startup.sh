@@ -1,6 +1,10 @@
-docker-compose up -d data-prepper opensearch
+docker-compose up -d opensearch opensearch-dashboards data-prepper
 
 
-sleep 5
+sleep 30
+
+sudo docker exec -it opensearch ./securityadmin_demo.sh
+
+sleep 60
 
 docker-compose up -d

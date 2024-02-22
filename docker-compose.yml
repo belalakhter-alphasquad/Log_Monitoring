@@ -17,9 +17,9 @@ services:
       - data-prepper
     volumes:
       - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
-      - /home/alpha/monkeytilt/java/crypto_games/gateway/logs/myApp.log:/var/log/gateway.log
-      - /home/alpha/monkeytilt/java/crypto_games/clusterservice/logs/myApp.log:/var/log/cluster.log
-      - /home/alpha/monkeytilt/java/crypto_games/hedger-client/logs/myApp.log:/var/log/hedger.log
+      - /home/shuraim/monkeytilt/java/crypto_games/gateway/logs/myApp.log:/var/log/gateway.log
+      - /home/shuraim/monkeytilt/java/crypto_games/clusterservice/logs/myApp.log:/var/log/cluster.log
+      - /home/shuraim/monkeytilt/java/crypto_games/hedger-client/logs/myApp.log:/var/log/hedger.log
       - ./test2.log:/var/log/test2.log
       - ./filter.lua:/fluent-bit/etc/filter.lua
       - /home/alpha/fluent-bit/storage:/var/log/flb-storage
@@ -35,11 +35,13 @@ services:
 
   opensearch:
     container_name: opensearch
-    image: opensearchproject/opensearch:latest
+    image: opensearchproject/opensearch:2.11.1
     environment:
       - discovery.type=single-node
       - bootstrap.memory_lock=true
       - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+    
+
     ulimits:
       memlock:
         soft: -1
@@ -53,8 +55,8 @@ services:
     networks:
       - opensearch-net
 
-  dashboards:
-    image: opensearchproject/opensearch-dashboards:latest
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:2.11.1
     container_name: opensearch-dashboards
     ports:
       - 5601:5601
